@@ -1,0 +1,22 @@
+{
+  "name": "knowgod/primitive-numbers-finder",
+  "description": "primitive numbers finder",
+  "type": "project",
+  "license": "MIT",
+  "version": "0.1.0",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "Arkadij Kuzhel",
+      "email": "arkuzhel@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^8.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Primitive\\": "src/"
+    }
+  }
+}

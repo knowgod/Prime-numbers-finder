@@ -1,0 +1,21 @@
+#!/usr/bin/env php
+<?php
+
+$autoloadLocations = [
+    getcwd() . '/vendor/autoload.php',
+    getcwd() . '/../../autoload.php',
+    __DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php',
+];
+
+foreach ($autoloadLocations as $autoload) {
+    if (is_file($autoload)) {
+        require_once $autoload;
+        break;
+    }
+}
+
+$count = $argv[1] ?? 10;
+
+$finder = new \Primitive\Finder();
+var_export($finder->findNumbers($count));
