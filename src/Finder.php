@@ -2,29 +2,40 @@
 
 namespace Primitive;
 
+use Amp\Future;
+use Amp\Parallel\Worker;
+use Primitive\IsPrimitive\Task;
+
 class Finder
 {
     private array $found = [1 => 1, 2, 3];
 
-    public function findNumbers(int $count): array
+    public function findNumbers(int $finish, ?int $start = null): array
     {
-        $checkNumber = end($this->found) + 2;
-        while (count($this->found) < $count) {
-            if ($this->isPrimitive($checkNumber)) {
-                $this->found[] = $checkNumber;
-            }
-            $checkNumber += 2;
-        }
-        return $this->found;
-    }
+        $start  = $start ?? end($this->found) + 2;
+        $finish = $finish % 2 == 0 ? $finish + 1 : $finish;
 
-    private function isPrimitive(int $checkNumber): bool
-    {
-        for ($i = 2; $i < ceil($checkNumber / 2); $i++) {
-            if ($checkNumber % $i == 0) {
-                return false;
+        $executions = [];
+        for ($checkNumber = $start; $checkNumber <= $finish; $checkNumber += 2) {
+            $executions[$checkNumber] = Worker\submit(new Task($checkNumber));
+        }
+
+        $responses = Future\await(
+            array_map(
+                function (Worker\Execution $e) {
+                    return $e->getFuture();
+                },
+                $executions,
+            ),
+        );
+
+        foreach ($responses as $checked => $response) {
+//            \printf("Number %d is %s\n", $checked, ($response ? 'primitive' : 'not primitive'));
+            if ($response) {
+                $this->found[] = $checked;
             }
         }
-        return true;
+
+        return $this->found;
     }
 }
