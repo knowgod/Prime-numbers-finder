@@ -8,12 +8,26 @@ use Primitive\IsPrimitive\Task;
 
 class Finder
 {
+    private const CONCURRENCY = 8;
+
     private array $found = [1 => 1, 2, 3];
 
-    public function findNumbers(int $finish, ?int $start = null): array
+    public function findNumbers(int $count): array
     {
-        $start  = $start ?? end($this->found) + 2;
-        $finish = $finish % 2 == 0 ? $finish + 1 : $finish;
+        while (count($this->found) < $count) {
+            $startWith = end($this->found) + 2;
+            $this->findNumbersInRange($startWith, $startWith + 2 * self::CONCURRENCY);
+        }
+        return $this->found;
+    }
+
+    public function findNumbersInRange(int $start, int $finish): array
+    {
+        $finish = $finish % 2 == 0 ? ++$finish : $finish;
+        $start  = $start % 2 == 0 ? --$start : $start;
+        if ($start < 3) {
+            $start = 3;
+        }
 
         $executions = [];
         for ($checkNumber = $start; $checkNumber <= $finish; $checkNumber += 2) {
