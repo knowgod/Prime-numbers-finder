@@ -22,7 +22,7 @@ class Finder
         return $this->found;
     }
 
-    public function findNumbersInRange(int $start, int $finish): array
+    public function findNumbersInRange(int $start, int $finish): void
     {
         $finish = $finish % 2 == 0 ? ++$finish : $finish;
         $start  = $start % 2 == 0 ? --$start : $start;
@@ -50,7 +50,5 @@ class Finder
                 $this->found[] = $checked;
             }
         }
-
-        return $this->found;
     }
 }
