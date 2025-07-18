@@ -10,19 +10,53 @@ use Primitive\IsPrimitive\Task;
 class Finder
 {
     private const CONCURRENCY = 16;
+    private const FILE_PATH = __DIR__ . '/../data/numbers.csv';
 
     private array $found = [1 => 1, 2, 3];
 
+    /**
+     * @var \Primitive\SaveTo\File
+     */
+    private SaveTo\File $saver;
+
+    public function __construct()
+    {
+        $this->saver = new SaveTo\File(self::FILE_PATH);
+    }
+
+    public function __destruct()
+    {
+        $this->saver->append($this->found);
+    }
+
     public function findNumbers(int $count): array
     {
+        $startWith = $this->getLastFoundItem() + 2;
         while (count($this->found) < $count) {
-            $startWith = end($this->found) + 2;
             $this->findNumbersInRange($startWith, $startWith + 2 * self::CONCURRENCY);
+            $startWith = end($this->found) + 2;
         }
         return $this->found;
     }
 
-    public function findNumbersInRange(int $start, int $finish): array
+    /**
+     * @return int
+     */
+    private function getLastFoundItem(): int
+    {
+        $lastFound = end($this->found);
+        try {
+            $fromFile = $this->saver->readLast();
+            if (null !== $fromFile) {
+                $lastFound = $fromFile;
+                $this->found = [];
+            }
+        } catch (\Throwable $e) {
+        }
+        return $lastFound;
+    }
+
+    public function findNumbersInRange(int $start, int $finish): void
     {
         $finish = $finish % 2 == 0 ? ++$finish : $finish;
         $start  = $start % 2 == 0 ? --$start : $start;
@@ -50,7 +84,5 @@ class Finder
                 $this->found[] = $checked;
             }
         }
-
-        return $this->found;
     }
 }
