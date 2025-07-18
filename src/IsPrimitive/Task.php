@@ -14,12 +14,15 @@ class Task implements \Amp\Parallel\Worker\Task
     /**
      * @inheritDoc
      */
-    public function run(Channel $channel, Cancellation $cancellation): bool
+    public function run(Channel $channel, Cancellation $cancellation): ?bool
     {
         $checkNumber = $this->checkNumber;
         for ($i = 2; $i < ceil($checkNumber / 2); $i++) {
             if ($checkNumber % $i == 0) {
                 return false;
+            }
+            if ($cancellation->isRequested()) {
+                return null;
             }
         }
         return true;
