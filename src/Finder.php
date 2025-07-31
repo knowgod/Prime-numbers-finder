@@ -1,11 +1,11 @@
 <?php
 
-namespace Primitive;
+namespace Knowgod\Prime;
 
 use Amp\Future;
 use Amp\Parallel\Worker;
 use Amp\TimeoutCancellation;
-use Primitive\IsPrimitive\Task;
+use Knowgod\Prime\IsPrime\Task;
 
 class Finder
 {
