@@ -59,11 +59,15 @@ class File implements \Knowgod\Prime\Api\IoInterface
             $cleanValues = [];
         } else {
             $parsedValues = explode($this->delimiter, $line);
-            $values       = array_map(function ($value) {
-                return intval(trim($value, ", \n\r\t\v\0"));
-            }, $parsedValues);
+            $cleanValues = [];
+            foreach ($parsedValues as $value) {
+                if (empty($value)) {
+                    continue;
+                }
+                $value               = intval(trim($value, ", \n\r\t\v\0"));
+                $cleanValues[$value] = $value;
+            }
 
-            $cleanValues = array_unique($values);
             file_put_contents($this->getFilePath(), implode($this->delimiter, $cleanValues));
         }
 
