@@ -1,8 +1,8 @@
 <?php
 
-namespace Primitive\SaveTo;
+namespace Knowgod\Prime\SaveTo;
 
-class File
+class File implements \Knowgod\Prime\Api\IoInterface
 {
     public function __construct(
         private readonly string $path,
