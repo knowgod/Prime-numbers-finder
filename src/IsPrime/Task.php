@@ -1,6 +1,6 @@
 <?php
 
-namespace Primitive\IsPrimitive;
+namespace Knowgod\Prime\IsPrime;
 
 use Amp\Cancellation;
 use Amp\Sync\Channel;

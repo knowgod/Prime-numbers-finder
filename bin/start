@@ -17,6 +17,6 @@ foreach ($autoloadLocations as $autoload) {
 
 $count = $argv[1] ?? 10;
 
-$finder = new \Primitive\Finder();
+$finder = new \Knowgod\Prime\Finder();
 $found  = $finder->findNumbers($count);
 echo "Found " . count($found) . " numbers: " . implode(', ', $found), PHP_EOL;
