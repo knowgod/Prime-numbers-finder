@@ -10,12 +10,12 @@ use Knowgod\Prime\IsPrime\Task;
 class Finder
 {
     private const CONCURRENCY = 16;
-    private const FILE_PATH = __DIR__ . '/../data/numbers.csv';
+    private const FILE_PATH = 'data/numbers.csv';
 
-    private array $found = [1 => 1, 2, 3];
+    private array $found = [1 => 2, 3];
 
     /**
-     * @var \Primitive\SaveTo\File
+     * @var \Knowgod\Prime\SaveTo\File
      */
     private SaveTo\File $saver;
 
@@ -79,7 +79,7 @@ class Finder
         );
 
         foreach ($responses as $checked => $response) {
-//            \printf("Number %d is %s\n", $checked, ($response ? 'primitive' : 'not primitive'));
+//            \printf("Number %d is %s\n", $checked, ($response ? 'prime' : 'not prime'));
             if ($response ?? false) {
                 $this->found[] = $checked;
             }

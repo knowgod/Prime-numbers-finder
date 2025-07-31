@@ -4,10 +4,47 @@ namespace Knowgod\Prime\SaveTo;
 
 class File implements \Knowgod\Prime\Api\IoInterface
 {
+    private string $fullPath;
+
     public function __construct(
         private readonly string $path,
         private readonly string $delimiter = ', ',
     ) {
+    }
+
+    /**
+     *
+     * @return string
+     */
+    private function getFilePath(): string
+    {
+        if (empty($this->fullPath)) {
+            $this->initFullPath($this->path);
+        }
+        return $this->fullPath;
+    }
+
+    /**
+     * @param string|null $path
+     *
+     * @return void
+     */
+    private function initFullPath(?string $path): void
+    {
+        if (empty($path)) {
+            throw new \InvalidArgumentException('Path cannot be empty');
+        }
+        $srcDir      = dirname(__FILE__);
+        $projectRoot = realpath($srcDir . '/../../');
+        $path        = $projectRoot . '/' . $path;
+        $directory   = dirname($path);
+        if (!file_exists($directory)) {
+            mkdir($directory, 0775, true);
+        }
+        if (!file_exists($path)) {
+            touch($path);
+        }
+        $this->fullPath = $path;
     }
 
     /**
@@ -17,22 +54,28 @@ class File implements \Knowgod\Prime\Api\IoInterface
      */
     public function read(): array
     {
-        $line         = trim(file_get_contents($this->path));
-        $parsedValues = explode($this->delimiter, $line);
-        $values       = array_map(function ($value) {
-            return intval(trim($value, ", \n\r\t\v\0"));
-        }, $parsedValues);
+        $line = trim(file_get_contents($this->getFilePath()));
+        if (empty($line)) {
+            $cleanValues = [];
+        } else {
+            $parsedValues = explode($this->delimiter, $line);
+            $values       = array_map(function ($value) {
+                return intval(trim($value, ", \n\r\t\v\0"));
+            }, $parsedValues);
 
-        $cleanValues = array_unique($values);
-        file_put_contents($this->path, implode($this->delimiter, $cleanValues));
+            $cleanValues = array_unique($values);
+            file_put_contents($this->getFilePath(), implode($this->delimiter, $cleanValues));
+        }
 
         return $cleanValues;
     }
 
     public function readLast(): ?int
     {
-        $allValues = $this->read();
-        $lastItem  = max($allValues);
+        if (empty($allValues = $this->read())) {
+            return null;
+        }
+        $lastItem = max($allValues);
         return !empty($lastItem) ? $lastItem : null;
     }
 
@@ -47,7 +90,7 @@ class File implements \Knowgod\Prime\Api\IoInterface
     public function append(array $data): void
     {
         try {
-            $fp = fopen($this->path, 'a');
+            $fp = fopen($this->getFilePath(), 'a');
             if ($fp === false) {
                 throw new \RuntimeException('Unable to open file');
             }
